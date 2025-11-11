@@ -4,66 +4,151 @@
   <meta charset="UTF-8" />
   <title>Wybór logotypu firmy</title>
   <style>
-    body { font-family: sans-serif; text-align: center; background: #f3f4f6; margin: 0; padding: 20px; }
-    h1 { margin-bottom: 10px; }
-    #grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 20px; }
-    .logo-card { background: white; border-radius: 10px; padding: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); cursor: pointer; transition: 0.2s; }
-    .logo-card:hover { transform: scale(1.05); }
-    img { width: 100%; height: 200px; object-fit: contain; }
-    #result { margin-top: 30px; font-size: 18px; }
+    body {
+      font-family: sans-serif;
+      background: #f3f4f6;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+    h1 {
+      margin-bottom: 10px;
+    }
+    #grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-top: 20px;
+    }
+    .logo-card {
+      background: white;
+      border-radius: 10px;
+      padding: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .logo-card:hover {
+      transform: scale(1.05);
+    }
+    img {
+      width: 100%;
+      height: 200px;
+      object-fit: contain;
+    }
+    #info {
+      margin-top: 20px;
+      font-size: 18px;
+    }
+    #results {
+      margin-top: 30px;
+      text-align: left;
+      display: inline-block;
+    }
   </style>
 </head>
 <body>
   <h1>Wybór logotypu firmy</h1>
-  <p>Kliknij najlepszy logotyp spośród 4 losowych – aplikacja wybierze Twoje TOP 4.</p>
+  <p id="instructions">Etap 1 z 3: wybierz najlepszy logotyp spośród 4. (Zestaw 1 z 48)</p>
   <div id="grid"></div>
-  <div id="result"></div>
+  <div id="info"></div>
+  <div id="results"></div>
 
   <script>
-        const IMAGE_COUNT = 192;
-        let images = [];
-        for (let i = 1; i <= IMAGE_COUNT; i++) {
-        images.push(`logos/logo (${i}).png`);
+    const IMAGE_COUNT = 192;
+    let allLogos = [];
+    for (let i = 1; i <= IMAGE_COUNT; i++) {
+      allLogos.push(`logos/logo (${i}).png`);
     }
 
-    function shuffle(a) {
-      for (let i = a.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [a[i], a[j]] = [a[j], a[i]];
-      }
-      return a;
-    }
-
-    let selected = [];
+    let stage = 1;
     let round = 0;
+    let winners48 = [];
+    let winners12 = [];
+    let final4 = [];
+    let ranking = [];
 
-    function renderRound() {
-      const grid = document.getElementById('grid');
-      const result = document.getElementById('result');
-      grid.innerHTML = '';
-      result.innerHTML = '';
+    function shuffle(array) {
+      return array.sort(() => Math.random() - 0.5);
+    }
 
-      if (images.length < 4) {
-        result.innerHTML = `<h2>Twój wynik:</h2><p>Wybrałeś 4 najlepsze logotypy:</p>
-          <ol>${selected.map((s, i) => `<li>${s}</li>`).join('')}</ol>`;
-        return;
-      }
-
-      const current = images.splice(0, 4);
-      current.forEach(img => {
-        const div = document.createElement('div');
-        div.className = 'logo-card';
-        div.innerHTML = `<img src="${img}" alt="">`;
-        div.onclick = () => {
-          selected.push(img);
-          renderRound();
-        };
-        grid.appendChild(div);
+    function renderRound(group, callback) {
+      const grid = document.getElementById("grid");
+      grid.innerHTML = "";
+      group.forEach((src) => {
+        const card = document.createElement("div");
+        card.className = "logo-card";
+        card.innerHTML = `<img src="${src}" alt="">`;
+        card.onclick = () => callback(src);
+        grid.appendChild(card);
       });
     }
 
-    shuffle(images);
-    renderRound();
+    function nextStage1() {
+      if (round >= 48) {
+        startStage2();
+        return;
+      }
+      document.getElementById("instructions").textContent = `Etap 1 z 3: wybierz najlepszy logotyp spośród 4. (Zestaw ${round + 1} z 48)`;
+      const group = allLogos.slice(round * 4, round * 4 + 4);
+      renderRound(group, (chosen) => {
+        winners48.push(chosen);
+        round++;
+        nextStage1();
+      });
+    }
+
+    function startStage2() {
+      stage = 2;
+      round = 0;
+      document.getElementById("instructions").textContent = "Etap 2 z 3: z 48 logotypów wybierzesz 12 zwycięzców (po 4 w rundzie).";
+      nextStage2();
+    }
+
+    function nextStage2() {
+      if (round >= 12) {
+        startStage3();
+        return;
+      }
+      const group = shuffle(winners48).slice(0, 4);
+      document.getElementById("instructions").textContent = `Etap 2 z 3: wybierz najlepszy logotyp spośród 4. (Runda ${round + 1} z 12)`;
+      renderRound(group, (chosen) => {
+        winners12.push(chosen);
+        round++;
+        nextStage2();
+      });
+    }
+
+    function startStage3() {
+      stage = 3;
+      round = 0;
+      final4 = shuffle(winners12).slice(0, 4);
+      ranking = [];
+      document.getElementById("instructions").textContent =
+        "Etap 3 z 3: wybierz kolejno 4 najlepsze logotypy (kliknięcie = miejsce 1, 2, 3, 4)";
+      renderRound(final4, (chosen) => {
+        if (!ranking.includes(chosen)) {
+          ranking.push(chosen);
+        }
+        if (ranking.length === 4) {
+          showResults();
+        } else {
+          document.getElementById("instructions").textContent = `Wybierz logotyp na miejsce ${ranking.length + 1}`;
+        }
+      });
+    }
+
+    function showResults() {
+      document.getElementById("grid").innerHTML = "";
+      document.getElementById("instructions").textContent = "Wynik końcowy – Twoje TOP 4 logotypy:";
+      const results = document.getElementById("results");
+      results.innerHTML = ranking
+        .map((src, i) => `<p><b>Miejsce ${i + 1}:</b> <img src="${src}" style="height:80px;"></p>`)
+        .join("");
+    }
+
+    shuffle(allLogos);
+    nextStage1();
   </script>
 </body>
 </html>
