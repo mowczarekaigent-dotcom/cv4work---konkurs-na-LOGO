@@ -2,7 +2,7 @@
 <html lang="pl">
 <head>
   <meta charset="UTF-8" />
-  <title>Wybór logotypu firmy — v11</title>
+  <title>Wybór logotypu firmy — CLEAN v12</title>
   <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
@@ -96,6 +96,10 @@
       background: #111827;
       white-space: pre-line;
     }
+    #endpointInfo {
+      font-size: 0.7rem;
+      opacity: 0.7;
+    }
     @media (max-width: 800px) {
       header h1 { font-size: 1.1rem; }
       header p { font-size: 0.8rem; }
@@ -105,10 +109,10 @@
 <body>
   <header>
     <div>
-      <h1>Wybór logotypu firmy</h1>
+      <h1>Wybór logotypu firmy — CLEAN v12</h1>
       <p id="instructions">Etap 1 z 3: wybierz najlepszy logotyp spośród 4. (Zestaw 1 z 48)</p>
       <p id="progress">Pozostało kliknięć: 72</p>
-      <p id="endpointInfo" style="font-size: 0.7rem; opacity: 0.7;"></p>
+      <p id="endpointInfo"></p>
     </div>
     <button id="restartBtn">🔁 Zacznij od początku</button>
   </header>
@@ -123,11 +127,11 @@
   </div>
 
   <script>
-    // 🔧 Twój endpoint Google Apps Script:
+    // 🔧 1. Twój endpoint Google Apps Script (ZOSTAW TAK JAK JEST, BO JEST DOBRY):
     const ENDPOINT_URL = 'https://script.google.com/macros/s/AKfycbxjceZCcOlnR2ojKd78YZaWVUGO4akZyPJbVajfo1H6czaUFWnOYP7Pw3weAdsYez-Q/exec';
 
-    // konfiguracja obrazków
-    const REPO = 'cv4work---konkurs-na-LOGO';
+    // 🔧 2. Konfiguracja grafik
+    const REPO = 'cv4work---konkurs-na-LOGO';  // nazwa repo
     const ASSET_BASE = `/${REPO}/logos/`;
     const IMAGE_COUNT = 192;
     const TOTAL_CLICKS = 48 + 12 + 12;
@@ -136,11 +140,18 @@
       ASSET_BASE + encodeURIComponent(`logo (${i + 1}).png`)
     );
 
+    // Stan
     let allLogos = [];
-    let stage = 1, round = 0, clickCount = 0;
-    let winners48 = [], winners12 = [], ranking = [], remaining12 = [];
+    let stage = 1;
+    let round = 0;
+    let clickCount = 0;
+    let winners48 = [];
+    let winners12 = [];
+    let remaining12 = [];
+    let ranking = [];
     let sessionId = '';
 
+    // DOM
     const grid = document.getElementById('grid');
     const instructionsEl = document.getElementById('instructions');
     const progressEl = document.getElementById('progress');
@@ -148,125 +159,182 @@
     const statusEl = document.getElementById('status');
     const endpointInfoEl = document.getElementById('endpointInfo');
 
-    function debug(msg){ statusEl.textContent = msg; }
-    function shuffle(a){ return a.map(v=>({v,sort:Math.random()})).sort((a,b)=>a.sort-b.sort).map(x=>x.v); }
-    function updateProgress(){ progressEl.textContent = `Pozostało kliknięć: ${TOTAL_CLICKS - clickCount}`; }
-    function setInstructions(t){ instructionsEl.textContent = t; }
-    function setGridLayout(c){ grid.style.gridTemplateColumns = c<=4?'repeat(2,1fr)':'repeat(4,1fr)'; grid.style.gridTemplateRows = c<=4?'repeat(2,1fr)':'repeat(3,1fr)'; }
+    function debug(msg) {
+      statusEl.textContent = msg;
+    }
 
-    function renderGroup(group, onChoose){
+    function shuffle(arr) {
+      return arr
+        .map(v => ({ v, sort: Math.random() }))
+        .sort((a, b) => a.sort - b.sort)
+        .map(x => x.v);
+    }
+
+    function updateProgress() {
+      const remaining = TOTAL_CLICKS - clickCount;
+      progressEl.textContent = `Pozostało kliknięć: ${remaining}`;
+    }
+
+    function setInstructions(text) {
+      instructionsEl.textContent = text;
+    }
+
+    function setGridLayout(count) {
+      if (count <= 4) {
+        grid.style.gridTemplateColumns = 'repeat(2, 1fr)';
+        grid.style.gridTemplateRows = 'repeat(2, 1fr)';
+      } else {
+        grid.style.gridTemplateColumns = 'repeat(4, 1fr)';
+        grid.style.gridTemplateRows = 'repeat(3, 1fr)';
+      }
+    }
+
+    function renderGroup(group, onChoose) {
       setGridLayout(group.length);
       grid.innerHTML = '';
-      group.forEach(src=>{
-        const d=document.createElement('div');
-        d.className='logo-card';
-        const i=document.createElement('img');
-        i.src=src; d.appendChild(i);
-        d.onclick=()=>onChoose(src);
-        grid.appendChild(d);
+      group.forEach(src => {
+        const card = document.createElement('div');
+        card.className = 'logo-card';
+        const img = document.createElement('img');
+        img.src = src;
+        img.alt = '';
+        card.appendChild(img);
+        card.onclick = () => onChoose(src);
+        grid.appendChild(card);
       });
     }
 
-function sendResultsToServer() {
-  if (!ENDPOINT_URL) {
-    debug('Brak ENDPOINT_URL w kodzie – wyniki nie zostaną wysłane do arkusza.');
-    return;
-  }
+    // 🔧 3. Wysyłanie wyników – PROSTA WERSJA (bez odczytu odpowiedzi, bez TypeError)
+    function sendResultsToServer() {
+      if (!ENDPOINT_URL) {
+        debug('Brak ENDPOINT_URL w kodzie – wyniki nie zostaną wysłane do arkusza.');
+        return;
+      }
 
-  const payload = JSON.stringify({
-    sessionId,
-    ranking,
-    clickCount
-  });
+      const payload = JSON.stringify({
+        sessionId,
+        ranking,
+        clickCount
+      });
 
-  // 1. Próba wysłania przez sendBeacon (bez CORS, bez odpowiedzi)
-  if (navigator.sendBeacon) {
-    const blob = new Blob([payload], { type: 'application/json' });
-    const ok = navigator.sendBeacon(ENDPOINT_URL, blob);
-    if (ok) {
-      debug('✅ Wyniki wysłane w tle (sendBeacon). Sprawdź arkusz Google, czy pojawił się nowy wiersz.');
-      return;
-    } else {
-      debug('⚠ Nie udało się wysłać przez sendBeacon, próba zapisu alternatywną metodą...');
+      // próbujemy wysłać w tle, bez czekania na odpowiedź
+      try {
+        fetch(ENDPOINT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: payload,
+          keepalive: true
+        });
+        debug('✅ Wysyłanie wyników zostało uruchomione.\nSprawdź arkusz Google, czy pojawił się nowy wiersz.');
+      } catch (e) {
+        debug('⚠ Przeglądarka nie mogła zainicjować wysyłki.\nJeśli to ważne, zgłoś to do osoby technicznej.');
+      }
     }
-  }
 
-  // 2. Fallback – zwykły fetch, ale NIE czytamy odpowiedzi i NIE straszymy błędami CORS
-  try {
-    fetch(ENDPOINT_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: payload,
-      keepalive: true
-    });
-    debug('✅ Wyniki zostały wysłane (fetch). Przeglądarka może nie pokazać odpowiedzi, ale dane zwykle docierają.');
-  } catch (e) {
-    debug('⚠ Próba wysłania wyników nie powiodła się w przeglądarce. Jeżeli to ważne, sprawdź ręcznie w arkuszu.');
-  }
-}
-
-
-    function nextStage1(){
-      if(round>=48){ startStage2(); return; }
-      setInstructions(`Etap 1 z 3: wybierz najlepszy logotyp spośród 4. (Zestaw ${round+1} z 48)`);
-      const group=allLogos.slice(round*4,round*4+4);
-      renderGroup(group,chosen=>{
+    // Etap 1: 192 → 48
+    function nextStage1() {
+      if (round >= 48) {
+        startStage2();
+        return;
+      }
+      setInstructions(`Etap 1 z 3: wybierz najlepszy logotyp spośród 4. (Zestaw ${round + 1} z 48)`);
+      const group = allLogos.slice(round * 4, round * 4 + 4);
+      renderGroup(group, chosen => {
         winners48.push(chosen);
-        clickCount++; updateProgress(); round++; nextStage1();
+        clickCount++;
+        updateProgress();
+        round++;
+        nextStage1();
       });
     }
 
-    function startStage2(){
-      stage=2; round=0; winners12=[];
-      const shuffled=shuffle(winners48);
-      const groups=[]; for(let i=0;i<shuffled.length;i+=4) groups.push(shuffled.slice(i,i+4));
+    // Etap 2: 48 → 12 (12 grup po 4)
+    function startStage2() {
+      stage = 2;
+      round = 0;
+      winners12 = [];
+      const shuffled = shuffle(winners48);
+      const groups = [];
+      for (let i = 0; i < shuffled.length; i += 4) {
+        groups.push(shuffled.slice(i, i + 4));
+      }
       nextStage2(groups);
     }
 
-    function nextStage2(groups){
-      if(round>=groups.length){ startStage3(); return; }
-      const group=groups[round];
-      setInstructions(`Etap 2 z 3: wybierz najlepszy logotyp spośród 4. (Runda ${round+1} z 12)`);
-      renderGroup(group,chosen=>{
+    function nextStage2(groups) {
+      if (round >= groups.length) {
+        startStage3();
+        return;
+      }
+      const group = groups[round];
+      setInstructions(`Etap 2 z 3: wybierz najlepszy logotyp spośród 4. (Runda ${round + 1} z 12)`);
+      renderGroup(group, chosen => {
         winners12.push(chosen);
-        clickCount++; updateProgress(); round++; nextStage2(groups);
+        clickCount++;
+        updateProgress();
+        round++;
+        nextStage2(groups);
       });
     }
 
-    function startStage3(){
-      stage=3; ranking=[]; remaining12=shuffle(winners12);
+    // Etap 3: ranking 1–12, kliknięte znika
+    function startStage3() {
+      stage = 3;
+      ranking = [];
+      remaining12 = shuffle(winners12);
       renderStage3Step();
     }
 
-    function renderStage3Step(){
-      if(remaining12.length===0){ showResults(); return; }
-      const place=ranking.length+1;
+    function renderStage3Step() {
+      if (remaining12.length === 0) {
+        showResults();
+        return;
+      }
+      const place = ranking.length + 1;
       setInstructions(`Etap 3 z 3: wybierz logotyp na miejsce ${place} z 12.`);
-      renderGroup(remaining12,chosen=>{
+      renderGroup(remaining12, chosen => {
         ranking.push(chosen);
-        clickCount++; updateProgress();
-        remaining12=remaining12.filter(x=>x!==chosen);
+        clickCount++;
+        updateProgress();
+        remaining12 = remaining12.filter(x => x !== chosen);
         renderStage3Step();
       });
     }
 
-    function showResults(){
-      grid.innerHTML=''; setInstructions('Twój ranking 12 logotypów:');
-      rankingEl.innerHTML=ranking.map((src,i)=>`<p><strong>${i+1}.</strong> <img src="${src}" height="60"></p>`).join('');
+    function showResults() {
+      grid.innerHTML = '';
+      setInstructions('Twój ranking 12 logotypów:');
+      rankingEl.innerHTML = ranking
+        .map((src, i) => `<p><strong>${i + 1}.</strong> <img src="${src}" height="60"></p>`)
+        .join('');
       sendResultsToServer();
     }
 
-    function restartAll(){
-      stage=1; round=0; clickCount=0; winners48=[]; winners12=[]; ranking=[]; remaining12=[];
-      sessionId='sess-'+Date.now();
-      allLogos=shuffle(MASTER_LOGOS.slice());
-      updateProgress();
+    function restartAll() {
+      stage = 1;
+      round = 0;
+      clickCount = 0;
+      winners48 = [];
+      winners12 = [];
+      remaining12 = [];
+      ranking = [];
+      statusEl.textContent = '';
+      rankingEl.innerHTML = '';
+      sessionId = 'sess-' + Date.now();
+
+      allLogos = shuffle(MASTER_LOGOS.slice());
+
       setInstructions('Etap 1 z 3: wybierz najlepszy logotyp spośród 4. (Zestaw 1 z 48)');
+      updateProgress();
       nextStage1();
     }
 
-    document.getElementById('restartBtn').onclick=restartAll;
-    endpointInfoEl.textContent='ENDPOINT_URL: '+ENDPOINT_URL;
+    document.getElementById('restartBtn').onclick = restartAll;
+
+    // Info o endpoint
+    endpointInfoEl.textContent = 'ENDPOINT_URL: ' + (ENDPOINT_URL || '(brak)');
+
+    // start
     restartAll();
   </script>
 </body>
