@@ -2,7 +2,7 @@
 <html lang="pl">
 <head>
   <meta charset="UTF-8" />
-  <title>Wybór logotypu — FINAL 12</title>
+  <title>Wybór logotypu — cv4work</title>
   <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
@@ -16,8 +16,99 @@
       display: flex;
       flex-direction: column;
     }
-    header {
-      padding: 8px 16px;
+
+    /* --- Widok startowy --- */
+    #intro {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .intro-card {
+      max-width: 900px;
+      width: 100%;
+      background: #020617;
+      border-radius: 18px;
+      padding: 24px 28px;
+      box-shadow: 0 18px 45px rgba(0,0,0,0.6);
+      border: 1px solid #1e293b;
+    }
+    .intro-header {
+      margin-bottom: 18px;
+    }
+    .intro-header h1 {
+      font-size: 1.6rem;
+      margin-bottom: 4px;
+    }
+    .intro-header h2 {
+      font-size: 1.05rem;
+      font-weight: 500;
+      color: #9ca3af;
+    }
+    .intro-section {
+      margin-bottom: 16px;
+      line-height: 1.6;
+      font-size: 0.95rem;
+    }
+    .intro-section h3 {
+      font-size: 1.05rem;
+      margin-bottom: 6px;
+      color: #e5e7eb;
+    }
+    .intro-section p {
+      margin-bottom: 8px;
+      color: #e5e7eb;
+    }
+    .intro-section ul {
+      margin-left: 18px;
+      margin-top: 4px;
+    }
+    .intro-section li {
+      margin-bottom: 4px;
+    }
+    .intro-legal {
+      font-size: 0.85rem;
+      color: #9ca3af;
+      border-top: 1px solid #1f2937;
+      padding-top: 10px;
+      margin-top: 4px;
+    }
+    .intro-footer {
+      margin-top: 18px;
+      display: flex;
+      justify-content: flex-end;
+    }
+    #startBtn {
+      border: none;
+      border-radius: 999px;
+      padding: 10px 20px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: #22c55e;
+      color: #022c22;
+      transition: 0.2s;
+      box-shadow: 0 10px 25px rgba(34,197,94,0.35);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    #startBtn:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.05);
+    }
+
+    /* --- Aplikacja głosowania --- */
+    #app {
+      display: none; /* pokazujemy dopiero po kliknięciu START */
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header.app-header {
+      padding: 10px 18px;
       background: #020617;
       box-shadow: 0 2px 6px rgba(0,0,0,0.4);
       display: flex;
@@ -26,46 +117,78 @@
       flex-wrap: wrap;
       gap: 8px;
       z-index: 10;
+      border-bottom: 1px solid #1e293b;
     }
-    header h1 { font-size: 1.3rem; margin: 0; }
-    header p { font-size: 0.85rem; opacity: 0.9; }
-    #progress { color: #38bdf8; font-weight: 600; }
+    .app-title-block {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .app-title-main {
+      font-size: 1.4rem;
+      font-weight: 650;
+    }
+    .app-title-sub {
+      font-size: 0.9rem;
+      color: #9ca3af;
+    }
+    #instructions {
+      font-size: 0.9rem;
+      margin-top: 2px;
+      color: #e5e7eb;
+    }
+    .app-header-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+    }
+    #progress {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #38bdf8;
+    }
     #restartBtn {
       border: none;
       border-radius: 999px;
       padding: 6px 14px;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       font-weight: 500;
       cursor: pointer;
       background: #f97316;
       color: #111827;
       transition: 0.2s;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.45);
     }
-    #restartBtn:hover { transform: scale(1.05); filter: brightness(1.05); }
+    #restartBtn:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.05);
+    }
+
     .grid-wrapper {
       flex: 1;
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 4px;
+      padding: 6px;
       min-height: 0;
     }
     #grid { width: 100%; height: 100%; display: grid; gap: 6px; }
     .logo-card {
       background: #0b1120;
-      border-radius: 12px;
+      border-radius: 16px;
       overflow: hidden;
       border: 2px solid #1e293b;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.2s ease;
+      transition: all 0.18s ease;
     }
     .logo-card:hover {
       transform: scale(1.03);
       border-color: #38bdf8;
+      box-shadow: 0 10px 24px rgba(15,23,42,0.9);
     }
     .logo-card img {
       width: 100%;
@@ -74,12 +197,19 @@
       object-position: center;
       background: #020617;
     }
+
     #results {
-      padding: 16px;
+      padding: 12px 18px 16px;
       background: #020617;
       border-top: 1px solid #1f2937;
     }
-    #ranking p { margin-bottom: 4px; font-size: 0.95rem; }
+    #ranking {
+      margin-bottom: 6px;
+    }
+    #ranking p {
+      margin-bottom: 4px;
+      font-size: 0.95rem;
+    }
     #ranking img {
       vertical-align: middle;
       margin-left: 8px;
@@ -89,44 +219,128 @@
     }
     #status {
       font-size: 0.8rem;
-      opacity: 0.85;
-      margin-top: 6px;
+      opacity: 0.9;
+      margin-top: 4px;
       padding: 6px 10px;
       border-radius: 6px;
       background: #111827;
       white-space: pre-line;
     }
-    #endpointInfo {
-      font-size: 0.7rem;
-      opacity: 0.7;
+
+    @media (max-width: 800px) {
+      .intro-card {
+        padding: 18px 16px;
+      }
+      .intro-header h1 {
+        font-size: 1.3rem;
+      }
+      header.app-header {
+        align-items: flex-start;
+      }
+      .app-header-right {
+        align-items: flex-start;
+      }
+      .app-title-main {
+        font-size: 1.2rem;
+      }
+      #instructions {
+        font-size: 0.85rem;
+      }
+      #progress {
+        font-size: 0.85rem;
+      }
     }
   </style>
 </head>
 <body>
-  <header>
-    <div>
-      <h1>Wybór logotypu — FINAL 12</h1>
-      <p id="instructions">Etap 1 z 3: wybierz najlepszy logotyp spośród 4. (Zestaw 1 z 48)</p>
-      <p id="progress">Pozostało kliknięć: 72</p>
-      <p id="endpointInfo"></p>
+  <!-- STRONA STARTOWA -->
+  <section id="intro">
+    <div class="intro-card">
+      <div class="intro-header">
+        <h1>Witamy w naszym badaniu wizerunku marki!</h1>
+        <h2>Pomóż nam wybrać najlepszy logotyp dla marki cv4work.</h2>
+      </div>
+
+      <div class="intro-section">
+        <p>
+          Chcielibyśmy zaprosić Cię do udziału w krótkim i angażującym procesie wyboru najlepszych
+          propozycji nowego logotypu. Spośród <strong>192 projektów</strong> wskażesz te, które
+          najbardziej przyciągają uwagę i najlepiej oddają charakter naszej marki.
+          Twoja opinia jest dla nas wyjątkowo cenna i realnie wpłynie na dalsze kierunki rozwoju
+          identyfikacji wizualnej.
+        </p>
+      </div>
+
+      <div class="intro-section">
+        <h3>Jak to działa?</h3>
+        <p>Aby ułatwić ocenę wszystkich propozycji, proces podzieliliśmy na trzy proste etapy:</p>
+
+        <p><strong>Etap 1 – Wybory wstępne (48 rund)</strong></p>
+        <ul>
+          <li>Otrzymasz losowe zestawy po 4 logotypy.</li>
+          <li>W każdej rundzie wskaż jeden najlepszy — ten, który najbardziej odpowiada Twoim preferencjom.</li>
+          <li>Po przejściu 48 rund wybierzesz w ten sposób 48 najlepiej ocenionych logotypów.</li>
+        </ul>
+
+        <p><strong>Etap 2 – Wybór finalistów (12 rund)</strong></p>
+        <ul>
+          <li>Wybrane wcześniej 48 logotypów zostanie ponownie podzielonych na losowe grupy po 4.</li>
+          <li>W każdej z 12 rund wybierz ten, który oceniasz najwyżej.</li>
+          <li>Na końcu tego etapu otrzymamy Twoją finałową dwunastkę logotypów.</li>
+        </ul>
+
+        <p><strong>Etap 3 – Ranking TOP 12</strong></p>
+        <ul>
+          <li>W ostatnim kroku zobaczysz swoje TOP 12 wybranych logotypów.</li>
+          <li>Twoim zadaniem będzie ułożyć je w kolejności od najlepszego do najsłabszego,
+            zgodnie z Twoją ostateczną oceną.</li>
+        </ul>
+      </div>
+
+      <div class="intro-section intro-legal">
+        <p><strong>Informacja prawna</strong></p>
+        <p>
+          Wszystkie prezentowane logotypy są chronione prawem autorskim i stanowią zastrzeżone znaki towarowe.
+          Kopiowanie, pobieranie, udostępnianie, wykorzystywanie ich w jakiejkolwiek formie
+          (np. publikacja na stronach internetowych lub w mediach społecznościowych) jest zabronione
+          bez pisemnej zgody właściciela marki.
+        </p>
+      </div>
+
+      <div class="intro-footer">
+        <button id="startBtn">PRZEJDŹ DO GŁOSOWANIA</button>
+      </div>
     </div>
-    <button id="restartBtn">🔁 Zacznij od początku</button>
-  </header>
+  </section>
 
-  <div class="grid-wrapper">
-    <div id="grid"></div>
-  </div>
+  <!-- APLIKACJA GŁOSOWANIA -->
+  <section id="app">
+    <header class="app-header">
+      <div class="app-title-block">
+        <span class="app-title-main">Wybór logotypu — cv4work</span>
+        <span class="app-title-sub">Trzystopniowy proces wyboru najlepszego znaku marki.</span>
+        <p id="instructions">Etap 1 z 3: wybierz najlepszy logotyp spośród 4. (Zestaw 1 z 48)</p>
+      </div>
+      <div class="app-header-right">
+        <div id="progress">Pozostało kliknięć: 72</div>
+        <button id="restartBtn">🔁 Rozpocznij głosowanie od nowa</button>
+      </div>
+    </header>
 
-  <div id="results">
-    <div id="ranking"></div>
-    <div id="status"></div>
-  </div>
+    <div class="grid-wrapper">
+      <div id="grid"></div>
+    </div>
+
+    <div id="results">
+      <div id="ranking"></div>
+      <div id="status"></div>
+    </div>
+  </section>
 
   <script>
-    // 🔧 Twój endpoint Web Appa
+    // 🔧 Endpoint Google Apps Script (Web App)
     const ENDPOINT_URL = 'https://script.google.com/macros/s/AKfycbxjceZCcOlnR2ojKd78YZaWVUGO4akZyPJbVajfo1H6czaUFWnOYP7Pw3weAdsYez-Q/exec';
 
-    // Konfiguracja obrazków
     const REPO = 'cv4work---konkurs-na-LOGO';
     const ASSET_BASE = `/${REPO}/logos/`;
     const IMAGE_COUNT = 192;
@@ -148,12 +362,15 @@
     let sessionId = '';
 
     // DOM
+    const introSection = document.getElementById('intro');
+    const appSection = document.getElementById('app');
+    const startBtn = document.getElementById('startBtn');
     const grid = document.getElementById('grid');
     const instructionsEl = document.getElementById('instructions');
     const progressEl = document.getElementById('progress');
     const rankingEl = document.getElementById('ranking');
     const statusEl = document.getElementById('status');
-    const endpointInfoEl = document.getElementById('endpointInfo');
+    const restartBtn = document.getElementById('restartBtn');
 
     function debug(msg) {
       statusEl.textContent = msg;
@@ -200,7 +417,7 @@
       });
     }
 
-    // Etap 1: 192 → 48
+    // --- Etap 1: 192 → 48 ---
     function nextStage1() {
       if (round >= 48) {
         startStage2();
@@ -217,7 +434,7 @@
       });
     }
 
-    // Etap 2: 48 → 12
+    // --- Etap 2: 48 → 12 ---
     function startStage2() {
       stage = 2;
       round = 0;
@@ -246,7 +463,7 @@
       });
     }
 
-    // Etap 3: ranking 1–12
+    // --- Etap 3: ranking TOP 12 ---
     function startStage3() {
       stage = 3;
       ranking = [];
@@ -270,13 +487,29 @@
       });
     }
 
+    // --- Podsumowanie: pokazujemy ranking i zbieramy go z DOM ---
     function showResults() {
       grid.innerHTML = '';
       setInstructions('Twój ranking 12 logotypów:');
+
+      // Wyświetlenie rankingu
       rankingEl.innerHTML = ranking
         .map((src, i) => `<p><strong>${i + 1}.</strong> <img src="${src}" height="60"></p>`)
         .join('');
-      sendResultsToServer();
+
+      // Odczytujemy faktyczny ranking 1–12 z DOM (to, co widzi użytkownik)
+      const imgs = rankingEl.querySelectorAll('img');
+      const finalRankingFromDOM = Array.from(imgs).map(img => {
+        try {
+          const url = new URL(img.src);
+          return url.pathname; // np. "/cv4work---konkurs-na-LOGO/logos/logo%20(25).png"
+        } catch (e) {
+          return img.src;
+        }
+      });
+
+      // Wysyłamy wyniki do serwera
+      sendResultsToServer(finalRankingFromDOM);
     }
 
     function restartAll() {
@@ -287,10 +520,10 @@
       winners12 = [];
       remaining12 = [];
       ranking = [];
-      sessionId = 'sess-' + Date.now();
-      statusEl.textContent = '';
       rankingEl.innerHTML = '';
+      statusEl.textContent = '';
 
+      sessionId = 'sess-' + Date.now();
       allLogos = shuffle(MASTER_LOGOS.slice());
 
       setInstructions('Etap 1 z 3: wybierz najlepszy logotyp spośród 4. (Zestaw 1 z 48)');
@@ -298,16 +531,17 @@
       nextStage1();
     }
 
-    // 👉 TU najważniejsze: wysyłka dokładnie 12 miejsc + clickCount
-    function sendResultsToServer() {
+    // --- Wysyłanie wyników do Google Apps Script ---
+    function sendResultsToServer(finalRanking) {
       if (!ENDPOINT_URL) {
         debug('Brak ENDPOINT_URL w kodzie – wyniki nie zostaną wysłane do arkusza.');
         return;
       }
 
+      // upewniamy się, że mamy dokładnie 12 pozycji
       const fixedRanking = [];
       for (let i = 0; i < 12; i++) {
-        fixedRanking.push(ranking[i] || '');
+        fixedRanking.push(finalRanking[i] || '');
       }
 
       const payloadObj = {
@@ -333,17 +567,22 @@
           '✅ Wysyłanie wyników zostało uruchomione (no-cors).\n' +
           'Wysłano ranking o długości: ' + fixedRanking.length +
           ', clickCount: ' + clickCount + '.\n' +
-          'Sprawdź arkusz Google (votes) – w nowym wierszu powinny być wypełnione kolumny C–N oraz O.'
+          'Sprawdź arkusz Google (votes), czy pojawił się nowy wiersz z miejscami 1–12.'
         );
       } catch (e) {
         debug('⚠ Przeglądarka nie mogła zainicjować wysyłki.\nJeśli to ważne, zgłoś to do osoby technicznej.');
       }
     }
 
-    document.getElementById('restartBtn').onclick = restartAll;
-    endpointInfoEl.textContent = 'ENDPOINT_URL: ' + ENDPOINT_URL;
+    // --- Sterowanie widokami ---
+    function startVoting() {
+      introSection.style.display = 'none';
+      appSection.style.display = 'flex';
+      restartAll();
+    }
 
-    restartAll();
+    startBtn.addEventListener('click', startVoting);
+    restartBtn.addEventListener('click', restartAll);
   </script>
 </body>
 </html>
