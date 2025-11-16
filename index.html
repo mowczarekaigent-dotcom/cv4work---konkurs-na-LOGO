@@ -212,7 +212,6 @@
     }
     .final-heading {
       font-size: 1.05rem;
-      margin-bottom: 0;
       text-align: center;
     }
     .podium {
@@ -306,29 +305,29 @@
     /* --- Mobile / pion smartfon --- */
     @media (max-width: 800px) {
       body {
-        font-size: 1.08rem;
+        font-size: 1.1rem;
       }
       .intro-card {
-        padding: 20px 16px;
+        padding: 22px 18px;
       }
       .intro-header h1 {
-        font-size: 1.5rem;
+        font-size: 1.6rem;
       }
       .intro-header h2 {
-        font-size: 1.1rem;
+        font-size: 1.15rem;
       }
       .intro-section {
-        font-size: 1.05rem;
+        font-size: 1.08rem;
       }
       .intro-section h3 {
-        font-size: 1.1rem;
+        font-size: 1.15rem;
       }
       .intro-legal {
-        font-size: 0.95rem;
+        font-size: 1rem;
       }
       #startBtn {
-        font-size: 1rem;
-        padding: 11px 22px;
+        font-size: 1.05rem;
+        padding: 12px 24px;
       }
 
       header.app-header {
@@ -336,21 +335,21 @@
         padding: 10px 12px;
       }
       .app-title-main {
-        font-size: 1.5rem;
+        font-size: 1.6rem;
       }
       .app-title-sub {
-        font-size: 1.1rem;
+        font-size: 1.2rem;
       }
       #instructions {
-        font-size: 1.05rem;
+        font-size: 1.1rem;
         margin-top: 4px;
       }
       #progress {
-        font-size: 1.05rem;
+        font-size: 1.1rem;
       }
       #restartBtn {
-        font-size: 1rem;
-        padding: 7px 16px;
+        font-size: 1.05rem;
+        padding: 8px 18px;
       }
 
       .podium-1 .podium-img-wrap { height: 150px; width: 150px; }
@@ -359,10 +358,10 @@
       .top-grid-img-wrap { height: 80px; }
 
       .final-heading {
-        font-size: 1.2rem;
+        font-size: 1.25rem;
       }
       #status {
-        font-size: 1rem;
+        font-size: 1.05rem;
       }
     }
   </style>
@@ -467,7 +466,6 @@
 
     // Stan
     let allLogos = [];
-    let stage = 1;
     let round = 0;
     let clickCount = 0;
     let finalists48 = [];
@@ -547,7 +545,6 @@
 
     // --- Etap 2: 48 → 12 ---
     function startStage2() {
-      stage = 2;
       round = 0;
       finalists12 = [];
 
@@ -577,7 +574,6 @@
 
     // --- Etap 3: ranking TOP 12 ---
     function startStage3() {
-      stage = 3;
       finalRanking = [];
       remainingForRanking = shuffle(finalists12);
       renderStage3Step();
@@ -604,7 +600,6 @@
       grid.innerHTML = '';
       setInstructions('Twój ranking 12 logotypów:');
 
-      // wymuszamy dokładnie 12 elementów
       const fixedRanking = [];
       for (let i = 0; i < 12; i++) {
         fixedRanking.push(finalRanking[i] || '');
@@ -680,7 +675,6 @@
     }
 
     function restartAll() {
-      stage = 1;
       round = 0;
       clickCount = 0;
       finalists48 = [];
@@ -698,7 +692,7 @@
       nextStage1();
     }
 
-    // --- Wysyłanie wyników do Google Apps Script ---
+    // --- Wysyłanie wyników do Google Apps Script (12 miejsc) ---
     function sendResultsToServer(fixedRanking) {
       if (!ENDPOINT_URL) {
         statusEl.textContent = '✅ Wysyłanie wyników zostało uruchomione.';
