@@ -2,7 +2,7 @@
 <html lang="pl">
 <head>
   <meta charset="UTF-8" />
-  <title>Wybór logotypu firmy — CLEAN v12</title>
+  <title>Wybór logotypu — FINAL 12</title>
   <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
@@ -100,16 +100,12 @@
       font-size: 0.7rem;
       opacity: 0.7;
     }
-    @media (max-width: 800px) {
-      header h1 { font-size: 1.1rem; }
-      header p { font-size: 0.8rem; }
-    }
   </style>
 </head>
 <body>
   <header>
     <div>
-      <h1>Wybór logotypu firmy — CLEAN v12</h1>
+      <h1>Wybór logotypu — FINAL 12</h1>
       <p id="instructions">Etap 1 z 3: wybierz najlepszy logotyp spośród 4. (Zestaw 1 z 48)</p>
       <p id="progress">Pozostało kliknięć: 72</p>
       <p id="endpointInfo"></p>
@@ -127,11 +123,11 @@
   </div>
 
   <script>
-    // 🔧 1. Twój endpoint Google Apps Script (ZOSTAW TAK JAK JEST, BO JEST DOBRY):
+    // 🔧 Twój endpoint Web Appa
     const ENDPOINT_URL = 'https://script.google.com/macros/s/AKfycbxjceZCcOlnR2ojKd78YZaWVUGO4akZyPJbVajfo1H6czaUFWnOYP7Pw3weAdsYez-Q/exec';
 
-    // 🔧 2. Konfiguracja grafik
-    const REPO = 'cv4work---konkurs-na-LOGO';  // nazwa repo
+    // Konfiguracja obrazków
+    const REPO = 'cv4work---konkurs-na-LOGO';
     const ASSET_BASE = `/${REPO}/logos/`;
     const IMAGE_COUNT = 192;
     const TOTAL_CLICKS = 48 + 12 + 12;
@@ -204,51 +200,6 @@
       });
     }
 
-    // 🔧 3. Wysyłanie wyników – PROSTA WERSJA (bez odczytu odpowiedzi, bez TypeError)
-
-	function sendResultsToServer() {
- 	 if (!ENDPOINT_URL) {
-  	  debug('Brak ENDPOINT_URL w kodzie – wyniki nie zostaną wysłane do arkusza.');
- 	   return;
- 	 }
-
- 	 // Wymuszamy dokładnie 12 pozycji w rankingu
- 	 const fixedRanking = [];
- 	 for (let i = 0; i < 12; i++) {
-  	  fixedRanking.push(ranking[i] || '');
- 	 }
-
-	  const payload = JSON.stringify({
-  	  sessionId,
-  	  ranking: fixedRanking,
-  	  clickCount: clickCount
- 	 });
-
- 	 try {
- 	   fetch(ENDPOINT_URL, {
-  	    method: 'POST',
-  	    mode: 'no-cors',           // unikamy problemów CORS
-  	    headers: {
-   	     'Content-Type': 'text/plain'
-   	   },
-    	  body: payload,
-   	   keepalive: true
-  	  });
-
-  	  debug(
-  	    '✅ Wysyłanie wyników zostało uruchomione (no-cors).\n' +
-   	   'Wysłano ranking o długości: ' + fixedRanking.length +
-  	    ', clickCount: ' + clickCount + '.\n' +
-   	   'Sprawdź arkusz Google, czy pojawił się nowy wiersz.'
-   	 );
- 	 } catch (e) {
- 	   debug('⚠ Przeglądarka nie mogła zainicjować wysyłki.\nJeśli to ważne, zgłoś to do osoby technicznej.');
- 	 }
-	}
-
-
-
-
     // Etap 1: 192 → 48
     function nextStage1() {
       if (round >= 48) {
@@ -266,7 +217,7 @@
       });
     }
 
-    // Etap 2: 48 → 12 (12 grup po 4)
+    // Etap 2: 48 → 12
     function startStage2() {
       stage = 2;
       round = 0;
@@ -295,7 +246,7 @@
       });
     }
 
-    // Etap 3: ranking 1–12, kliknięte znika
+    // Etap 3: ranking 1–12
     function startStage3() {
       stage = 3;
       ranking = [];
@@ -336,9 +287,9 @@
       winners12 = [];
       remaining12 = [];
       ranking = [];
+      sessionId = 'sess-' + Date.now();
       statusEl.textContent = '';
       rankingEl.innerHTML = '';
-      sessionId = 'sess-' + Date.now();
 
       allLogos = shuffle(MASTER_LOGOS.slice());
 
@@ -347,12 +298,51 @@
       nextStage1();
     }
 
+    // 👉 TU najważniejsze: wysyłka dokładnie 12 miejsc + clickCount
+    function sendResultsToServer() {
+      if (!ENDPOINT_URL) {
+        debug('Brak ENDPOINT_URL w kodzie – wyniki nie zostaną wysłane do arkusza.');
+        return;
+      }
+
+      const fixedRanking = [];
+      for (let i = 0; i < 12; i++) {
+        fixedRanking.push(ranking[i] || '');
+      }
+
+      const payloadObj = {
+        sessionId,
+        ranking: fixedRanking,
+        clickCount: clickCount
+      };
+
+      const payload = JSON.stringify(payloadObj);
+
+      try {
+        fetch(ENDPOINT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: {
+            'Content-Type': 'text/plain'
+          },
+          body: payload,
+          keepalive: true
+        });
+
+        debug(
+          '✅ Wysyłanie wyników zostało uruchomione (no-cors).\n' +
+          'Wysłano ranking o długości: ' + fixedRanking.length +
+          ', clickCount: ' + clickCount + '.\n' +
+          'Sprawdź arkusz Google (votes) – w nowym wierszu powinny być wypełnione kolumny C–N oraz O.'
+        );
+      } catch (e) {
+        debug('⚠ Przeglądarka nie mogła zainicjować wysyłki.\nJeśli to ważne, zgłoś to do osoby technicznej.');
+      }
+    }
+
     document.getElementById('restartBtn').onclick = restartAll;
+    endpointInfoEl.textContent = 'ENDPOINT_URL: ' + ENDPOINT_URL;
 
-    // Info o endpoint
-    endpointInfoEl.textContent = 'ENDPOINT_URL: ' + (ENDPOINT_URL || '(brak)');
-
-    // start
     restartAll();
   </script>
 </body>
