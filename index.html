@@ -167,20 +167,44 @@
       });
     }
 
-    async function sendResultsToServer(){
-      if(!ENDPOINT_URL){
-        debug('Brak ENDPOINT_URL w kodzie.');
-        return;
-      }
-      const payload={sessionId, ranking, clickCount};
-      debug('📤 Wysyłanie wyników...');
-      try{
-        const res=await fetch(ENDPOINT_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
-        const text=await res.text();
-        if(!res.ok){debug('⚠ Błąd HTTP: '+res.status+'\n'+text);return;}
-        debug('✅ Wyniki wysłane. Odpowiedź: '+text);
-      }catch(e){debug('⚠ Błąd sieci: '+e);}
+function sendResultsToServer() {
+  if (!ENDPOINT_URL) {
+    debug('Brak ENDPOINT_URL w kodzie – wyniki nie zostaną wysłane do arkusza.');
+    return;
+  }
+
+  const payload = JSON.stringify({
+    sessionId,
+    ranking,
+    clickCount
+  });
+
+  // 1. Próba wysłania przez sendBeacon (bez CORS, bez odpowiedzi)
+  if (navigator.sendBeacon) {
+    const blob = new Blob([payload], { type: 'application/json' });
+    const ok = navigator.sendBeacon(ENDPOINT_URL, blob);
+    if (ok) {
+      debug('✅ Wyniki wysłane w tle (sendBeacon). Sprawdź arkusz Google, czy pojawił się nowy wiersz.');
+      return;
+    } else {
+      debug('⚠ Nie udało się wysłać przez sendBeacon, próba zapisu alternatywną metodą...');
     }
+  }
+
+  // 2. Fallback – zwykły fetch, ale NIE czytamy odpowiedzi i NIE straszymy błędami CORS
+  try {
+    fetch(ENDPOINT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: payload,
+      keepalive: true
+    });
+    debug('✅ Wyniki zostały wysłane (fetch). Przeglądarka może nie pokazać odpowiedzi, ale dane zwykle docierają.');
+  } catch (e) {
+    debug('⚠ Próba wysłania wyników nie powiodła się w przeglądarce. Jeżeli to ważne, sprawdź ręcznie w arkuszu.');
+  }
+}
+
 
     function nextStage1(){
       if(round>=48){ startStage2(); return; }
