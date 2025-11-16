@@ -100,7 +100,7 @@
 
     /* --- APLIKACJA GŁOSOWANIA --- */
     #app {
-      display: none;          /* na starcie ukryte; JS ustawi display:flex */
+      display: none;   /* na starcie ukryte; JS ustawi display:flex */
       flex: 1;
       min-height: 0;
       flex-direction: column;
@@ -208,11 +208,11 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
     }
     .final-heading {
       font-size: 1.05rem;
-      margin-bottom: 2px;
+      margin-bottom: 0;
       text-align: center;
     }
     .podium {
@@ -294,8 +294,8 @@
     }
 
     #status {
-      font-size: 0.85rem;
-      margin-top: 6px;
+      font-size: 0.9rem;
+      margin-top: 8px;
       padding: 6px 10px;
       border-radius: 6px;
       background: #111827;
@@ -306,19 +306,29 @@
     /* --- Mobile / pion smartfon --- */
     @media (max-width: 800px) {
       body {
-        font-size: 1.05rem;
+        font-size: 1.08rem;
       }
       .intro-card {
-        padding: 18px 16px;
+        padding: 20px 16px;
       }
       .intro-header h1 {
-        font-size: 1.4rem;
+        font-size: 1.5rem;
       }
       .intro-header h2 {
-        font-size: 1.0rem;
+        font-size: 1.1rem;
       }
       .intro-section {
-        font-size: 1.0rem;
+        font-size: 1.05rem;
+      }
+      .intro-section h3 {
+        font-size: 1.1rem;
+      }
+      .intro-legal {
+        font-size: 0.95rem;
+      }
+      #startBtn {
+        font-size: 1rem;
+        padding: 11px 22px;
       }
 
       header.app-header {
@@ -326,20 +336,20 @@
         padding: 10px 12px;
       }
       .app-title-main {
-        font-size: 1.4rem;
+        font-size: 1.5rem;
       }
       .app-title-sub {
-        font-size: 1.0rem;
+        font-size: 1.1rem;
       }
       #instructions {
-        font-size: 1.0rem;
+        font-size: 1.05rem;
         margin-top: 4px;
       }
       #progress {
-        font-size: 1.0rem;
+        font-size: 1.05rem;
       }
       #restartBtn {
-        font-size: 0.95rem;
+        font-size: 1rem;
         padding: 7px 16px;
       }
 
@@ -349,7 +359,10 @@
       .top-grid-img-wrap { height: 80px; }
 
       .final-heading {
-        font-size: 1.15rem;
+        font-size: 1.2rem;
+      }
+      #status {
+        font-size: 1rem;
       }
     }
   </style>
@@ -474,10 +487,6 @@
     const statusEl = document.getElementById('status');
     const restartBtn = document.getElementById('restartBtn');
 
-    function debug(msg) {
-      statusEl.textContent = msg;
-    }
-
     function shuffle(arr) {
       return arr
         .map(v => ({ v, sort: Math.random() }))
@@ -590,11 +599,12 @@
       });
     }
 
-    // --- Podsumowanie z podium + TOP4–12 + wysyłka ---
+    // --- Podsumowanie: podium + TOP4–12 + wysyłka ---
     function showResults() {
       grid.innerHTML = '';
       setInstructions('Twój ranking 12 logotypów:');
 
+      // wymuszamy dokładnie 12 elementów
       const fixedRanking = [];
       for (let i = 0; i < 12; i++) {
         fixedRanking.push(finalRanking[i] || '');
@@ -689,7 +699,7 @@
     }
 
     // --- Wysyłanie wyników do Google Apps Script ---
-    function sendResultsToServer(finalRanking) {
+    function sendResultsToServer(fixedRanking) {
       if (!ENDPOINT_URL) {
         statusEl.textContent = '✅ Wysyłanie wyników zostało uruchomione.';
         return;
@@ -697,7 +707,7 @@
 
       const payloadObj = {
         sessionId,
-        ranking: finalRanking,
+        ranking: fixedRanking,   // 12 elementów
         clickCount: clickCount
       };
 
