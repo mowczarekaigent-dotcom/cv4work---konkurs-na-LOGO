@@ -163,7 +163,8 @@
 
   <script>
     // 🔧 TUTAJ WKLEJASZ URL Z APPS SCRIPT:
-    const ENDPOINT_URL = 'https://script.google.com/macros/s/AKfycbxjceZCcOlnR2ojKd78YZaWVUGO4akZyPJbVajfo1H6czaUFWnOYP7Pw3weAdsYez-Q/exec';
+    const ENDPOINT_URL = 'const ENDPOINT_URL = 'https://script.google.com/macros/s/AKfycbxjceZCcOlnR2ojKd78YZaWVUGO4akZyPJbVajfo1H6czaUFWnOYP7Pw3weAdsYez-Q/exec';
+';
 
     const IMAGE_COUNT = 192;
     const TOTAL_CLICKS = 48 + 12 + 12;
@@ -252,37 +253,42 @@
 
     // --- Wysyłanie wyników do Google Apps Script ---
     async function sendResultsToServer() {
-      if (!ENDPOINT_URL || ENDPOINT_URL === 'https://script.google.com/macros/s/AKfycbxjceZCcOlnR2ojKd78YZaWVUGO4akZyPJbVajfo1H6czaUFWnOYP7Pw3weAdsYez-Q/exec') {
-        debug('Wyniki zapisane lokalnie.\n(Ustaw ENDPOINT_URL, aby wysyłać je do arkusza Google.)');
-        return;
-      }
-      if (!ENDPOINT_URL.startsWith('https://script.google.com/macros/s/')) {
-        debug('ENDPOINT_URL nie wygląda na adres Google Apps Script.\nSprawdź, czy wkleiłeś poprawny URL Web Appa (kończący się na /exec).');
-        return;
-      }
+  // 1) MUSI być ustawiony jakikolwiek URL – inaczej nie próbujemy
+  if (!ENDPOINT_URL) {
+    debug('Wyniki zapisane lokalnie.\n(Brak ENDPOINT_URL w kodzie.)');
+    return;
+  }
 
-      const payload = { sessionId, ranking, clickCount };
+  // 2) Krótka walidacja formatu – ale nie blokujemy prawidłowego adresu
+  if (!ENDPOINT_URL.startsWith('https://script.google.com/macros/s/')) {
+    debug('ENDPOINT_URL nie wygląda na adres Google Apps Script.\nSprawdź, czy wkleiłeś poprawny URL Web Appa (kończący się na /exec).');
+    return;
+  }
 
-      debug('📤 Wysyłanie wyników...\n(Jeśli coś pójdzie nie tak, pokażę kod błędu tutaj.)');
+  const payload = { sessionId, ranking, clickCount };
 
-      try {
-        const res = await fetch(ENDPOINT_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
+  debug('📤 Wysyłanie wyników...');
 
-        const text = await res.text();
-        if (!res.ok) {
-          debug('⚠ Błąd HTTP przy wysyłaniu wyników.\nStatus: ' + res.status + '\nOdpowiedź:\n' + text.slice(0, 300));
-          return;
-        }
+  try {
+    const res = await fetch(ENDPOINT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
 
-        debug('✅ Wyniki zostały wysłane.\nOdpowiedź serwera:\n' + text.slice(0, 300));
-      } catch (err) {
-        debug('⚠ Błąd sieci podczas wysyłania wyników:\n' + err);
-      }
+    const text = await res.text();
+
+    if (!res.ok) {
+      debug('⚠ Błąd HTTP przy wysyłaniu wyników.\nStatus: ' + res.status + '\nOdpowiedź:\n' + text.slice(0, 300));
+      return;
     }
+
+    debug('✅ Wyniki zostały wysłane.\nOdpowiedź serwera: ' + text.slice(0, 300));
+  } catch (err) {
+    debug('⚠ Błąd sieci podczas wysyłania wyników:\n' + err);
+  }
+}
+
 
     // --- ETAP 1: 192 → 48 ---
     function nextStage1() {
