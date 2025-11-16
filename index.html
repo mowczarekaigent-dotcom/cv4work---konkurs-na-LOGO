@@ -205,31 +205,37 @@
     }
 
     // 🔧 3. Wysyłanie wyników – PROSTA WERSJA (bez odczytu odpowiedzi, bez TypeError)
-    function sendResultsToServer() {
-      if (!ENDPOINT_URL) {
-        debug('Brak ENDPOINT_URL w kodzie – wyniki nie zostaną wysłane do arkusza.');
-        return;
-      }
 
-      const payload = JSON.stringify({
-        sessionId,
-        ranking,
-        clickCount
-      });
+	function sendResultsToServer() {
+	  if (!ENDPOINT_URL) {
+	    debug('Brak ENDPOINT_URL w kodzie – wyniki nie zostaną wysłane do arkusza.');
+	    return;
+	  }
 
-      // próbujemy wysłać w tle, bez czekania na odpowiedź
-      try {
-        fetch(ENDPOINT_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: payload,
-          keepalive: true
-        });
-        debug('✅ Wysyłanie wyników zostało uruchomione.\nSprawdź arkusz Google, czy pojawił się nowy wiersz.');
-      } catch (e) {
-        debug('⚠ Przeglądarka nie mogła zainicjować wysyłki.\nJeśli to ważne, zgłoś to do osoby technicznej.');
-      }
-    }
+	  const payload = JSON.stringify({
+	    sessionId,
+	    ranking,
+	    clickCount
+	  });
+
+	  // 👉 Wysyłamy w trybie no-cors, prosty POST, bez odczytu odpowiedzi
+	  try {
+	    fetch(ENDPOINT_URL, {
+	      method: 'POST',
+  	    mode: 'no-cors',
+   	   headers: {
+ 	       'Content-Type': 'text/plain'   // prosty typ -> brak preflightu CORS
+ 	     },
+ 	     body: payload,
+ 	     keepalive: true
+ 	   });
+
+  	  debug('✅ Wysyłanie wyników zostało uruchomione (no-cors).\nSprawdź arkusz Google, czy pojawił się nowy wiersz.');
+ 	 } catch (e) {
+	    debug('⚠ Przeglądarka nie mogła zainicjować wysyłki.\nJeśli to ważne, zgłoś to do osoby technicznej.');
+	  }
+	}
+
 
     // Etap 1: 192 → 48
     function nextStage1() {
