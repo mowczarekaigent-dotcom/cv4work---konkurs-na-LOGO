@@ -100,10 +100,9 @@
 
     /* --- APLIKACJA GŁOSOWANIA --- */
     #app {
-      display: none;
+      display: none;          /* na starcie ukryte; JS ustawi display:flex */
       flex: 1;
       min-height: 0;
-      display: flex;
       flex-direction: column;
     }
 
@@ -199,7 +198,7 @@
     }
 
     #results {
-      padding: 12px 18px 16px;
+      padding: 10px 14px 14px;
       background: #020617;
       border-top: 1px solid #1f2937;
     }
@@ -208,18 +207,19 @@
     .final-wrapper {
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      align-items: center;
+      gap: 12px;
     }
     .final-heading {
       font-size: 1.05rem;
-      margin-bottom: 4px;
+      margin-bottom: 2px;
+      text-align: center;
     }
     .podium {
       display: flex;
       align-items: flex-end;
       justify-content: center;
       gap: 8px;
-      margin-bottom: 8px;
     }
     .podium-item {
       display: flex;
@@ -261,6 +261,8 @@
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 8px;
       margin-top: 4px;
+      width: 100%;
+      max-width: 520px;
     }
     .top-grid-item {
       background: #020617;
@@ -298,34 +300,57 @@
       border-radius: 6px;
       background: #111827;
       white-space: pre-line;
+      text-align: center;
     }
 
+    /* --- Mobile / pion smartfon --- */
     @media (max-width: 800px) {
+      body {
+        font-size: 1.05rem;
+      }
       .intro-card {
         padding: 18px 16px;
       }
       .intro-header h1 {
-        font-size: 1.3rem;
+        font-size: 1.4rem;
       }
+      .intro-header h2 {
+        font-size: 1.0rem;
+      }
+      .intro-section {
+        font-size: 1.0rem;
+      }
+
       header.app-header {
         align-items: flex-start;
-      }
-      .app-header-right {
-        align-items: flex-start;
+        padding: 10px 12px;
       }
       .app-title-main {
-        font-size: 1.2rem;
+        font-size: 1.4rem;
+      }
+      .app-title-sub {
+        font-size: 1.0rem;
       }
       #instructions {
-        font-size: 0.85rem;
+        font-size: 1.0rem;
+        margin-top: 4px;
       }
       #progress {
-        font-size: 0.85rem;
+        font-size: 1.0rem;
       }
+      #restartBtn {
+        font-size: 0.95rem;
+        padding: 7px 16px;
+      }
+
       .podium-1 .podium-img-wrap { height: 150px; width: 150px; }
       .podium-2 .podium-img-wrap { height: 130px; width: 130px; }
       .podium-3 .podium-img-wrap { height: 115px; width: 115px; }
       .top-grid-img-wrap { height: 80px; }
+
+      .final-heading {
+        font-size: 1.15rem;
+      }
     }
   </style>
 </head>
@@ -423,7 +448,6 @@
     const IMAGE_COUNT = 192;
     const TOTAL_CLICKS = 48 + 12 + 12;
 
-    // Ścieżki do wszystkich 192 plików
     const MASTER_LOGOS = Array.from({ length: IMAGE_COUNT }, (_, i) =>
       ASSET_BASE + encodeURIComponent(`logo (${i + 1}).png`)
     );
@@ -571,19 +595,15 @@
       grid.innerHTML = '';
       setInstructions('Twój ranking 12 logotypów:');
 
-      // upewniamy się, że mamy dokładnie 12 elementów
       const fixedRanking = [];
       for (let i = 0; i < 12; i++) {
         fixedRanking.push(finalRanking[i] || '');
       }
 
-      // TOP 1–3
       const top1 = fixedRanking[0] || '';
       const top2 = fixedRanking[1] || '';
       const top3 = fixedRanking[2] || '';
-
-      // TOP4–TOP12
-      const rest = fixedRanking.slice(3); // 9 elementów
+      const rest = fixedRanking.slice(3);
 
       let podiumHtml = '';
       if (top1 || top2 || top3) {
@@ -617,7 +637,7 @@
           <div class="top-grid">
             ${rest
               .map((src, idx) => {
-                const place = idx + 4; // numer od 4 do 12
+                const place = idx + 4;
                 if (!src) {
                   return `<div class="top-grid-item">
                     <div class="place-number">${place}</div>
@@ -646,7 +666,6 @@
         </div>
       `;
 
-      // WYŚLIJ wyniki
       sendResultsToServer(fixedRanking);
     }
 
@@ -672,7 +691,7 @@
     // --- Wysyłanie wyników do Google Apps Script ---
     function sendResultsToServer(finalRanking) {
       if (!ENDPOINT_URL) {
-        debug('✅ Wysyłanie wyników zostało uruchomione.');
+        statusEl.textContent = '✅ Wysyłanie wyników zostało uruchomione.';
         return;
       }
 
@@ -695,7 +714,6 @@
           keepalive: true
         });
 
-        // Na dole tylko prosty komunikat potwierdzający
         statusEl.textContent = '✅ Wysyłanie wyników zostało uruchomione.';
       } catch (e) {
         statusEl.textContent = '⚠ Nie udało się wysłać wyników.';
@@ -706,8 +724,6 @@
     function startVoting() {
       introSection.style.display = 'none';
       appSection.style.display = 'flex';
-
-      // Inicjacja sesji i głosowania
       restartAll();
     }
 
