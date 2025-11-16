@@ -208,38 +208,44 @@
 
 	function sendResultsToServer() {
  	 if (!ENDPOINT_URL) {
- 	   debug('Brak ENDPOINT_URL w kodzie – wyniki nie zostaną wysłane do arkusza.');
+  	  debug('Brak ENDPOINT_URL w kodzie – wyniki nie zostaną wysłane do arkusza.');
  	   return;
  	 }
 
- 	 // 🔹 Zabezpieczenie: tworzymy NA SZTYWNO tablicę 12 pozycji
+ 	 // Wymuszamy dokładnie 12 pozycji w rankingu
  	 const fixedRanking = [];
  	 for (let i = 0; i < 12; i++) {
-  	  fixedRanking.push(ranking[i] || '');  // jeśli brakuje – będzie pusty string
+  	  fixedRanking.push(ranking[i] || '');
  	 }
 
- 	 const payload = JSON.stringify({
-	    sessionId,
+	  const payload = JSON.stringify({
+  	  sessionId,
   	  ranking: fixedRanking,
-  	  clickCount
+  	  clickCount: clickCount
  	 });
 
  	 try {
-    	fetch(ENDPOINT_URL, {
-    	  method: 'POST',
-    	  mode: 'no-cors',
-     	 headers: {
-     	   'Content-Type': 'text/plain'
-     	 },
-     	 body: payload,
-    	  keepalive: true
-    	});
+ 	   fetch(ENDPOINT_URL, {
+  	    method: 'POST',
+  	    mode: 'no-cors',           // unikamy problemów CORS
+  	    headers: {
+   	     'Content-Type': 'text/plain'
+   	   },
+    	  body: payload,
+   	   keepalive: true
+  	  });
 
-  	  debug('✅ Wysyłanie wyników zostało uruchomione (no-cors).\nSprawdź arkusz Google, czy pojawił się nowy wiersz.');
+  	  debug(
+  	    '✅ Wysyłanie wyników zostało uruchomione (no-cors).\n' +
+   	   'Wysłano ranking o długości: ' + fixedRanking.length +
+  	    ', clickCount: ' + clickCount + '.\n' +
+   	   'Sprawdź arkusz Google, czy pojawił się nowy wiersz.'
+   	 );
  	 } catch (e) {
  	   debug('⚠ Przeglądarka nie mogła zainicjować wysyłki.\nJeśli to ważne, zgłoś to do osoby technicznej.');
  	 }
 	}
+
 
 
 
